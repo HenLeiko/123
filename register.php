@@ -1,16 +1,25 @@
 <?php
 $data = $_POST;
 
-if (isset($data['send'])){
-    $oal = fopen('login.txt', 'a');
-    $addlogin = fwrite($oal, $data['login'].PHP_EOL);
-    fclose($oal);
-    $oap = fopen('password.txt', 'a');
-    $addpassword = fwrite($oap, $data['password'].PHP_EOL);
-    fclose($oap);
+if (!empty($_POST)) {
+    $curl = curl_init(); //инициализация сеанса
+    curl_setopt($curl, CURLOPT_URL, 'http://localhost/api.lemon/users'); //урл сайта к которому обращаемся
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt ($curl, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
+    curl_setopt($curl, CURLOPT_HEADER, 0); //выводим заголовки
+    curl_setopt($curl, CURLOPT_POST, 1); //передача данных методом POST
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); //теперь curl вернет нам ответ, а не выведет
+    curl_setopt($curl, CURLOPT_POSTFIELDS, //тут переменные которые будут переданы методом POST
+      array (
+        'login'=>@$_POST['reg-login'],
+        'password'=>@$_POST['reg-password'],
+          'searchButton'=>'get' //это на случай если на сайте, к которому обращаемся проверяется была ли нажата кнопка submit, а не была ли оправлена форма
+          ));
+    curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0'); //эта строчка как-бы говорит: "я не скрипт, я огнелис" :)
+    curl_setopt ($curl, CURLOPT_REFERER, "https://"); //а вдруг там проверяют наличие рефера
+    $res = curl_exec($curl);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,10 +29,11 @@ if (isset($data['send'])){
     <title>Document</title>
 </head>
 <body>
-    <form  method="post">
-    <input type="text" name="login" placeholder="Login">
-    <input type="password" name="password" id="pass" placeholder="Password">
-    <input type="submit" value="Регистрация" name="send">
+    <form  action="" method="POST">
+    <input type="text" name="reg-login" placeholder="Login">
+    <input type="password" name="reg-password" id="pass" placeholder="Password">
+    <input type="submit" value="Регистрация" id="send" name="send">
     </form>
+    <script src="script.js"></script>
 </body>
 </html>

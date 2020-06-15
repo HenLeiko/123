@@ -1,17 +1,5 @@
 <?php 
-    $data = $_POST;
-    if (isset($data['send'])){
-        $line = 1;
-        while (($text = fgets('login.txt', 15)) !== false) {
-            if ($text === $data['login']) {
-                $search = !$search;
-                return $line;
-            }
-            if ($search) return $line;
-            $line++;
-        }
-    }
-    echo $line
+
 ?>
 
 <!DOCTYPE html>
